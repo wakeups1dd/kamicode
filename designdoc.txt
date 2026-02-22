@@ -1,0 +1,463 @@
+KamiCode – Hackathon Technical Design Document
+
+AI-Native Competitive Programming with Verifiable On-Chain Credentials
+
+1. Overview
+
+KamiCode (Hackathon MVP) is a minimal AI-native competitive programming platform that:
+
+Accepts coding submissions
+
+Evaluates correctness deterministically
+
+Uses AI to analyze algorithm complexity
+
+Computes an efficiency score
+
+Mints ERC-721 NFTs for verified achievements
+
+Is optimized for AMD CPU/GPU architecture
+
+This document describes system design, architecture, data flow, APIs, and infrastructure.
+
+2. Design Goals (Hackathon Scope)
+Primary Goals
+
+Demonstrate AI-powered code evaluation
+
+Show deterministic sandbox execution
+
+Mint verifiable on-chain NFTs
+
+Be AMD-compatible (CPU + GPU)
+
+Run on a single-node deployment
+
+Non-Goals (Out of Scope)
+
+Full seasonal engine
+
+Rush mode
+
+Advanced anti-cheat
+
+Distributed microservice cluster
+
+Production-grade scaling
+
+3. High-Level Architecture
+Client (Next.js)
+        ↓
+FastAPI Backend
+        ↓
+Submission Service
+        ↓
+Sandbox Execution Engine (Docker)
+        ↓
+AI Analysis Service (PyTorch + ROCm)
+        ↓
+Scoring Engine
+        ↓
+Achievement Engine
+        ↓
+NFT Minting Service
+        ↓
+Polygon Testnet
+4. System Components
+4.1 Frontend
+
+Stack:
+
+Next.js
+
+TailwindCSS
+
+Ethers.js
+
+WalletConnect / MetaMask
+
+Responsibilities:
+
+Display daily problem
+
+Submit code
+
+Show result
+
+Show AI analysis
+
+Display leaderboard
+
+Trigger NFT mint
+
+Display NFT metadata
+
+4.2 Backend API
+
+Framework:
+FastAPI
+
+Responsibilities:
+
+Authentication (OAuth optional)
+
+Problem serving
+
+Submission handling
+
+Evaluation orchestration
+
+Score computation
+
+NFT mint triggering
+
+Core API Endpoints:
+
+POST /submit
+GET /problem/today
+GET /leaderboard
+POST /mint
+GET /submission/{id}
+
+4.3 Sandbox Execution Engine
+
+Isolation:
+
+Docker container per submission
+
+Execution flow:
+
+Write user code to temp file
+
+Inject test cases
+
+Compile (if needed)
+
+Run with limits
+
+Capture:
+
+Runtime (ms)
+
+Memory usage
+
+Pass/Fail
+
+Limits:
+
+CPU time: 2 seconds
+
+Memory: 256MB
+
+No network
+
+No file write
+
+Optimized for multi-core scaling on
+Advanced Micro Devices EPYC CPUs
+
+Parallel execution handled by async workers.
+
+4.4 AI Analysis Service
+
+Framework:
+PyTorch
+
+Configured for:
+
+ROCm backend (AMD GPU)
+
+CPU fallback if GPU unavailable
+
+Function:
+Analyze solution and output:
+
+Estimated time complexity
+
+Estimated space complexity
+
+Approach description
+
+Efficiency score (0–100)
+
+AI Input Format
+
+Prompt:
+
+Analyze the following solution.
+
+Code:
+<user_code>
+
+Determine:
+1. Time complexity
+2. Space complexity
+3. Algorithmic approach
+4. Efficiency rating from 0 to 100
+AI Output (Structured JSON)
+{
+  "time_complexity": "O(n log n)",
+  "space_complexity": "O(n)",
+  "approach": "Sorting + Two Pointer",
+  "efficiency_score": 87
+}
+
+Inference can run:
+
+On AMD GPU via ROCm
+
+On CPU for fallback demo
+
+4.5 Scoring Engine
+
+Inputs:
+
+Correctness (binary)
+
+Runtime percentile
+
+AI efficiency score
+
+Formula (MVP Simplified):
+
+Final Score =
+  50% Correctness
++ 30% Runtime Efficiency
++ 20% AI Score
+
+Correct submissions only qualify for NFT eligibility.
+
+4.6 Achievement Engine
+
+Checks:
+
+Is first correct solver?
+
+Is in top 10% runtime?
+
+Efficiency score > threshold?
+
+Has 5 cumulative correct solves? (MVP streak)
+
+Returns:
+Boolean eligibility + achievement type.
+
+4.7 NFT Minting Service
+
+Standard:
+ERC-721
+
+Blockchain:
+Polygon Testnet
+
+Metadata Stored:
+
+IPFS or centralized JSON endpoint (MVP acceptable)
+
+Metadata Example:
+
+{
+  "problem_id": "2026-02-22",
+  "wallet": "0x123...",
+  "runtime_ms": 54,
+  "ai_time_complexity": "O(n log n)",
+  "ai_space_complexity": "O(n)",
+  "efficiency_score": 87,
+  "timestamp": "2026-02-22T14:05:32Z"
+}
+
+Mint triggered only after backend validation.
+
+5. Data Model
+5.1 Tables
+Users
+
+id
+
+email
+
+wallet_address
+
+created_at
+
+Problems
+
+id
+
+title
+
+description
+
+difficulty
+
+created_at
+
+Submissions
+
+id
+
+user_id
+
+problem_id
+
+code
+
+runtime_ms
+
+memory_kb
+
+ai_time_complexity
+
+ai_space_complexity
+
+efficiency_score
+
+is_correct
+
+created_at
+
+Achievements
+
+id
+
+user_id
+
+submission_id
+
+type
+
+minted (boolean)
+
+token_id
+
+6. Concurrency Design
+
+Submission Handling:
+
+Async queue
+
+Worker pool
+
+Max concurrent containers = N (based on CPU cores)
+
+On AMD EPYC:
+High core count → parallel evaluation scaling.
+
+7. Error Handling
+
+Cases:
+
+Compilation error
+
+Runtime error
+
+Timeout
+
+Memory overflow
+
+AI service failure
+
+Blockchain mint failure
+
+Strategy:
+
+Graceful fallback
+
+Retry mint if blockchain fails
+
+AI fallback to CPU inference
+
+8. Security Considerations
+
+Container isolation
+
+No shell access
+
+Rate limiting per user
+
+Server-side mint validation
+
+Wallet signature verification
+
+Input sanitization
+
+9. Performance Targets (Hackathon)
+
+Submission evaluation: < 3 seconds
+AI analysis: < 2 seconds
+NFT mint: < 20 seconds
+Leaderboard refresh: < 1 second
+
+10. Deployment Architecture (Hackathon Version)
+
+Single VM:
+
+Backend container
+
+Database container
+
+AI container
+
+Redis container (optional)
+
+Smart contract deployed separately
+
+Optimized for AMD-compatible host machine.
+
+11. Observability (Basic)
+
+Console logging
+
+Submission timing logs
+
+Error logs
+
+Mint transaction logging
+
+12. Risks & Mitigation
+
+AI hallucinating complexity
+→ Use structured prompting
+
+GPU unavailable
+→ CPU fallback enabled
+
+Mint failure
+→ Allow manual retry
+
+High submission burst
+→ Limit concurrent containers
+
+13. Demo Readiness Checklist
+
+Problem loads
+
+Submission works
+
+Runtime measured
+
+AI outputs complexity
+
+Leaderboard updates
+
+NFT mints successfully
+
+Metadata viewable on explorer
+
+14. Why This Design Works for Hackathon
+
+It clearly demonstrates:
+
+AI-native evaluation
+
+Deterministic compute
+
+AMD GPU compatibility
+
+Parallel CPU scaling
+
+On-chain verification
+
+Real-world applicability
+
+It is technically deep but realistically buildable in a hackathon timeframe.
