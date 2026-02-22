@@ -1,0 +1,292 @@
+KamiCode
+AI-Native Competitive Programming with Verifiable On-Chain Credentials
+
+1. Product Overview
+
+KamiCode is an AI-native competitive programming platform that converts verified coding performance into on-chain NFTs as portable proof of skill.
+
+It combines:
+
+Depth-based algorithmic competition (Daily Mode)
+
+Speed-based streak solving (Rush Mode)
+
+AI-based code quality analysis
+
+Season-based rating systems
+
+NFT-based verifiable credentials
+
+2. Problem Statement
+
+Existing platforms like:
+
+LeetCode
+
+Codeforces
+
+HackerRank
+
+Have limitations:
+
+Achievements are centralized
+
+No verifiable proof of “first solver”
+
+No immutable ranking history
+
+Badges are non-transferable
+
+No on-chain competitive context
+
+Developers cannot publicly prove competitive performance with timestamped validation.
+
+3. Vision
+
+Transform coding performance into:
+
+A decentralized reputation layer
+
+A competitive esport system
+
+A verifiable hiring signal
+
+A seasonal skill graph
+
+4. User Personas
+🎓 Student
+
+Wants to prove skill publicly
+
+Wants resume differentiation
+
+Seeks streak-based motivation
+
+👨‍💻 Competitive Programmer
+
+Cares about ratings and rankings
+
+Wants verified achievements
+
+Seeks performance analytics
+
+🏢 Recruiter
+
+Wants verifiable proof of skill
+
+Needs ranking context
+
+Values efficiency metrics
+
+5. Core Product Modes
+5.1 Daily Challenge Mode (Depth + Efficiency)
+Description
+
+One DSA problem per day.
+
+Functional Flow
+
+User opens daily challenge
+
+Submits code
+
+System runs:
+
+Deterministic correctness evaluation
+
+AI-based reasoning analysis
+
+Efficiency comparison
+
+Rating updated
+
+Achievements validated
+
+NFT minted (if milestone met)
+
+Features
+
+Elo-style rating
+
+League tiers (Bronze → Grandmaster)
+
+Weekly leaderboard
+
+Seasonal resets (30-day)
+
+First-solver detection
+
+Head-to-head duels
+
+Analytics dashboard
+
+NFT Mint Conditions
+
+First correct solver
+
+Most efficient solution
+
+Top 1% ranking
+
+7/30/90-day streak
+
+League promotion
+
+Seasonal champion
+
+NFT Metadata Structure
+{
+  problem_id,
+  timestamp,
+  achievement_type,
+  estimated_time_complexity,
+  difficulty,
+  ranking_position,
+  league_tier,
+  season_id
+}
+5.2 DSA Puzzle Rush Mode (Speed + Reflex)
+Description
+
+3–5 minute rapid-fire solving session.
+
+Mechanics
+
+Timed mode
+
+One mistake = session end (or limited lives)
+
+Score = max streak
+
+Separate blitz rating
+
+Variants
+
+3-minute blitz
+
+5-minute endurance
+
+Sudden death
+
+Seasonal Rush tournaments
+
+Rush NFT Metadata
+{
+  rush_session_id,
+  max_streak,
+  total_time,
+  percentile,
+  rating_after_session,
+  difficulty_tier,
+  season_id
+}
+6. System Architecture Requirements
+Engines Required
+
+Deterministic Execution Engine
+
+AI Reasoning Engine
+
+Rush Engine
+
+Rating Engine
+
+League Engine
+
+Season Engine
+
+Achievement Engine
+
+NFT Minting Service
+
+Metadata Storage
+
+Blockchain Integration
+
+7. Non-Functional Requirements
+Performance
+
+Code evaluation < 2 seconds
+
+Rush evaluation < 300ms per question
+
+Real-time leaderboard updates
+
+Scalability
+
+10K concurrent users initially
+
+Horizontally scalable architecture
+
+Security
+
+Sandbox code execution
+
+Anti-cheat detection
+
+Smart contract audit
+
+Rate limiting
+
+Reliability
+
+99.5% uptime
+
+Redundant evaluator nodes
+
+8. Monetization Model
+
+Premium analytics dashboard
+
+Seasonal tournament entry fees
+
+NFT marketplace royalties
+
+Recruiter access plans
+
+Sponsored seasonal prizes
+
+9. Success Metrics
+
+Daily active users
+
+Season participation rate
+
+NFT mint rate
+
+Retention (7-day, 30-day)
+
+Average rating improvement
+
+Recruiter adoption
+
+10. Roadmap (MVP → Scale)
+Phase 1 (MVP)
+
+Daily mode only
+
+Deterministic evaluation
+
+Basic rating system
+
+NFT minting for top 1%
+
+Phase 2
+
+Rush mode
+
+AI reasoning engine
+
+Leagues
+
+Analytics dashboard
+
+Phase 3
+
+Seasonal tournaments
+
+On-chain reputation explorer
+
+Hiring integrations
+
+Esports-style live competitions
