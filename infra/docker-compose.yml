@@ -1,0 +1,61 @@
+# ──────────────────────────────────────────────────────────────────
+# KamiCode — Docker Compose for Local Development
+# ──────────────────────────────────────────────────────────────────
+
+services:
+  # ─── PostgreSQL 16 ─────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: kamicode-db
+    environment:
+      POSTGRES_USER: kamicode
+      POSTGRES_PASSWORD: kamicode_dev
+      POSTGRES_DB: kamicode
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U kamicode" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── Redis 7 ───────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: kamicode-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ─── FastAPI Backend ───────────────────────────────────────────
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: kamicode-backend
+    env_file:
+      - ../.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    driver: local
+  redisdata:
+    driver: local

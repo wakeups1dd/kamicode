@@ -1,0 +1,94 @@
+achievements:
+  - id: FIRST_SOLVER
+    name: "First Solver"
+    description: "Be the first to solve a daily challenge."
+    trigger: submission.accepted
+    conditions:
+      - type: first_accepted_for_problem
+
+  - id: MOST_EFFICIENT
+    name: "Most Efficient"
+    description: "Highest quality score in a daily challenge (after 24h)."
+    trigger: submission.analyzed
+    conditions:
+      - type: highest_quality_score
+
+  - id: STREAK_7
+    name: "Week Warrior"
+    description: "Maintain a 7-day daily challenge streak."
+    trigger: submission.accepted
+    conditions:
+      - type: streak_reaches
+        value: 7
+
+  - id: STREAK_30
+    name: "Month Master"
+    description: "Maintain a 30-day daily challenge streak."
+    trigger: submission.accepted
+    conditions:
+      - type: streak_reaches
+        value: 30
+
+  - id: SILVER_PROMO
+    name: "Silver Tier"
+    description: "Reached the Silver League."
+    trigger: rating.updated
+    conditions:
+      - type: tier_reaches
+        value: "silver"
+
+  - id: GOLD_PROMO
+    name: "Gold Tier"
+    description: "Reached the Gold League."
+    trigger: rating.updated
+    conditions:
+      - type: tier_reaches
+        value: "gold"
+
+  - id: DIAMOND_PROMO
+    name: "Diamond Tier"
+    description: "Reached the Diamond League."
+    trigger: rating.updated
+    conditions:
+      - type: tier_reaches
+        value: "diamond"
+
+  - id: GRANDMASTER_PROMO
+    name: "Grandmaster"
+    description: "Reached the Grandmaster League."
+    trigger: rating.updated
+    conditions:
+      - type: tier_reaches
+        value: "grandmaster"
+
+  - id: RUSH_10
+    name: "Speed Demon"
+    description: "Reach a streak of 10 in Rush mode."
+    trigger: rush.completed
+    conditions:
+      - type: rush_streak_reaches
+        value: 10
+
+  - id: RUSH_50
+    name: "Rush Legend"
+    description: "Reach a streak of 50 in Rush mode."
+    trigger: rush.completed
+    conditions:
+      - type: rush_streak_reaches
+        value: 50
+
+  - id: TOP_1_PCT
+    name: "Top 1% Quality"
+    description: "Achieve a quality score in the top 1% of all solutions."
+    trigger: submission.analyzed
+    conditions:
+      - type: quality_percentile
+        value: 99
+
+  - id: SEASON_GENESIS
+    name: "Genesis Participant"
+    description: "Participated in Season 1."
+    trigger: season.ended
+    conditions:
+      - type: season_participation
+        season_slug: "season-1-genesis"
