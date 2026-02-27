@@ -34,7 +34,7 @@ class ProblemGenerator:
             title=data["title"],
             slug=data["slug"],
             description=data["description"],
-            difficulty=data["difficulty"],
+            difficulty=data["difficulty"].lower(),
             test_cases=ProblemTestCases(
                 sample=[TestCase(**tc) for tc in data["test_cases"]["sample"]],
                 hidden=[TestCase(**tc) for tc in data["test_cases"]["hidden"]]

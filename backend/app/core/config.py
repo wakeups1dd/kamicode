@@ -44,8 +44,9 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # ─── AI Engine ─────────────────────────────────────────────────
-    OPENAI_API_KEY: Optional[str] = None
-    AI_MODEL: str = "gpt-4o"
+    GEMINI_API_KEY: Optional[str] = None
+    GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
+    AI_MODEL: str = "gemini-2.5-flash"
 
     # ─── Blockchain ────────────────────────────────────────────────
     CHAIN_RPC_URL: str = "https://sepolia.base.org"

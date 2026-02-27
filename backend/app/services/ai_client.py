@@ -5,17 +5,22 @@ settings = get_settings()
 
 class AIClient:
     def __init__(self):
-        self.api_key = settings.OPENAI_API_KEY
+        self.api_key = settings.GEMINI_API_KEY
+        self.base_url = settings.GEMINI_BASE_URL
         # Treat placeholder key as None
-        if self.api_key and not self.api_key.startswith("sk-your-"):
-            self.client = openai.AsyncOpenAI(api_key=self.api_key)
+        if self.api_key and not self.api_key.startswith("sk-your-") and self.api_key != "YOUR_GEMINI_API_KEY":
+            self.client = openai.AsyncOpenAI(
+                api_key=self.api_key,
+                base_url=self.base_url
+            )
         else:
             self.client = None
 
-    async def generate_json(self, system_prompt: str, user_prompt: str, model: str = "gpt_4o_mini"):
+    async def generate_json(self, system_prompt: str, user_prompt: str, model: str = None):
+        model = model or settings.AI_MODEL
         if not self.client:
             # Mock behavior if no key is provided
-            print(f"⚠️ OPENAI_API_KEY not found. Returning mock for: {user_prompt[:30]}...")
+            print(f"⚠️ GEMINI_API_KEY not found. Returning mock for: {user_prompt[:30]}...")
             if "Rush" in system_prompt or "puzzle" in user_prompt.lower():
                 return json.dumps({
                     "puzzles": [
