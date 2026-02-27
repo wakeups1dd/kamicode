@@ -13,6 +13,11 @@ export interface Analysis {
     explanation: string;
     time_complexity: string;
     space_complexity: string;
+    quality_score: number;
+    approach_name: string;
+    percentile_rank: number;
+    feedback: string;
+    model_used: string;
     [key: string]: unknown;
 }
 
