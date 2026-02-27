@@ -44,8 +44,21 @@ class ProblemService:
 
     async def get_daily_problem(self) -> Optional[Problem]:
         today = date.today()
+        # First try to get today's exact problem
         result = await self.db.execute(select(Problem).where(Problem.daily_date == today))
-        return result.scalar_one_or_none()
+        problem = result.scalar_one_or_none()
+        
+        # If not found (e.g. running locally without celery beat cron job), get the most recent daily
+        if not problem:
+            result = await self.db.execute(
+                select(Problem)
+                .where(Problem.daily_date.isnot(None))
+                .order_by(Problem.daily_date.desc())
+                .limit(1)
+            )
+            problem = result.scalar_one_or_none()
+            
+        return problem
 
     async def list_problems(self, difficulty: str = None, tag: str = None) -> List[Problem]:
         query = select(Problem)
