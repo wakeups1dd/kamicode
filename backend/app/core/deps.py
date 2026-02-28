@@ -55,11 +55,39 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
+    # Supabase manages auth.users, but we need a corresponding row in public.users
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
 
     if user is None:
-        raise credentials_exception
+        # First time login/signup -> copy identity into public.users
+        email = payload.get("email", "")
+        # Create a default username based on email or user_id prefix if not provided
+        username = payload.get("user_metadata", {}).get("username")
+        if not username:
+            username = email.split("@")[0] if email else user_id[:8]
+
+        # Handle duplicate username scenario locally
+        base_username = username
+        counter = 1
+        while True:
+            existing = await db.execute(select(User).where(User.username == username))
+            if existing.scalar_one_or_none() is None:
+                break
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        user = User(
+            id=user_id,
+            email=email,
+            username=username,
+            classical_rating=1200,
+            blitz_rating=1200,
+            league_tier="bronze",
+            is_active=True,
+        )
+        db.add(user)
+        await db.flush()
 
     if not user.is_active:
         raise HTTPException(
