@@ -20,18 +20,37 @@ export interface Puzzle {
     [key: string]: unknown;
 }
 
+export interface PuzzleResponse {
+    id: string;
+    type: string;
+    difficulty: number;
+    content: {
+        question: string;
+        options: string[];
+        snippet?: string;
+    };
+}
+
 export function useRushSession() {
     const [session, setSession] = useState<RushSession | null>(null);
     const [currentPuzzle, setCurrentPuzzle] = useState<Puzzle | null>(null);
     const [isEnding, setIsEnding] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const mapPuzzle = (p: PuzzleResponse): Puzzle => ({
+        id: p.id,
+        puzzle_type: p.type,
+        question: p.content.question,
+        snippet: p.content.snippet,
+        options: p.content.options,
+    });
+
     const startSession = async (mode: string = 'Classical') => {
         setError(null);
         try {
-            const data = await api.post<{ session: RushSession; first_puzzle: Puzzle }>('/rush/start', { mode });
+            const data = await api.post<{ session: RushSession; first_puzzle: PuzzleResponse }>('/rush/start', { mode });
             setSession(data.session);
-            setCurrentPuzzle(data.first_puzzle);
+            setCurrentPuzzle(mapPuzzle(data.first_puzzle));
             return data;
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : String(err));
@@ -42,7 +61,7 @@ export function useRushSession() {
         if (!session || !currentPuzzle) return;
 
         try {
-            const data = await api.post<{ is_correct: boolean; next_puzzle?: Puzzle }>(`/rush/sessions/${session.id}/answer`, {
+            const data = await api.post<{ is_correct: boolean; next_puzzle?: PuzzleResponse }>(`/rush/sessions/${session.id}/answer`, {
                 puzzle_id: currentPuzzle.id,
                 user_answer: answer
             });
@@ -54,7 +73,7 @@ export function useRushSession() {
             }
 
             if (data.next_puzzle) {
-                setCurrentPuzzle(data.next_puzzle);
+                setCurrentPuzzle(mapPuzzle(data.next_puzzle));
             } else {
                 setIsEnding(true);
             }

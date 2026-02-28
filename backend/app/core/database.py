@@ -29,6 +29,8 @@ else:
         max_overflow=10,
         pool_pre_ping=True,
         pool_recycle=3600,
+        # Required for Supabase / PostgreSQL transaction connection pooler
+        connect_args={"statement_cache_size": 0, "prepared_statement_cache_size": 0},
     )
 
 # ─── Session Factory ──────────────────────────────────────────────

@@ -9,7 +9,6 @@ from app.models.submission import Submission
 from app.schemas.submission import SubmissionCreate
 from app.services.sandbox import get_sandbox
 from app.services.ai_analysis_service import AIAnalysisService
-from app.engines.analysis_tasks import analyze_submission_task
 from app.engines.rating_tasks import update_user_rating_task
 from app.engines.achievement_tasks import process_achievement_event_task
 from app.core.websocket import manager
@@ -57,10 +56,18 @@ class SubmissionService:
         await self.db.commit()
         await self.db.refresh(new_submission)
         
-        # 5. Trigger AI Analysis if accepted
+        # 5. Trigger AI Analysis if accepted (runs as asyncio background task within uvicorn's loop)
         if new_submission.verdict == "accepted":
+            async def _run_analysis(sub_id: str):
+                from app.core.database import async_session_maker
+                from app.services.ai_analysis_service import AIAnalysisService
+                async with async_session_maker() as analysis_db:
+                    service = AIAnalysisService(analysis_db)
+                    await service.analyze_submission(sub_id)
+
+            asyncio.create_task(_run_analysis(new_submission.id))
+
             try:
-                analyze_submission_task.delay(new_submission.id)
                 # Achievement: submission.accepted
                 process_achievement_event_task.delay("submission.accepted", {
                     "user_id": user_id,
@@ -68,7 +75,7 @@ class SubmissionService:
                     "problem_id": new_submission.problem_id
                 })
             except Exception as e:
-                print(f"⚠️ Failed to enqueue analysis or achievement: {e}")
+                print(f"⚠️ Failed to enqueue achievement: {e}")
         
         # 6. Trigger Rating Update
         try:

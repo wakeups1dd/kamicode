@@ -50,7 +50,7 @@ export function useSubmission() {
     };
 
     const pollAnalysis = async (submissionId: string) => {
-        const maxAttempts = 10;
+        const maxAttempts = 20;
         let attempts = 0;
 
         const interval = setInterval(async () => {
@@ -69,7 +69,7 @@ export function useSubmission() {
                     clearInterval(interval);
                 }
             }
-        }, 2000);
+        }, 3000);
     };
 
     return { submitCode, isSubmitting, submission, analysis, error };

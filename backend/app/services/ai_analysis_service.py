@@ -58,7 +58,7 @@ Runtime: {submission.runtime_ms}ms
         
         # We manually handle the mock logic here if we want more specific mock data for analysis
         if not self.ai_client.client:
-            print("⚠️ Using mock analysis result...")
+            print("⚠️ Using mock analysis result (no API key)...")
             analysis_data = {
                 "time_complexity": "O(n)",
                 "space_complexity": "O(n)",
@@ -67,8 +67,18 @@ Runtime: {submission.runtime_ms}ms
                 "feedback": "Excellent use of a hash map to achieve linear time complexity. The code is clean and follows best practices."
             }
         else:
-            json_str = await self.ai_client.generate_json(system_prompt, user_prompt)
-            analysis_data = json.loads(json_str)
+            try:
+                json_str = await self.ai_client.generate_json(system_prompt, user_prompt)
+                analysis_data = json.loads(json_str)
+            except Exception as e:
+                print(f"⚠️ AI analysis failed ({e}), using mock fallback...")
+                analysis_data = {
+                    "time_complexity": "O(n)",
+                    "space_complexity": "O(1)",
+                    "approach_name": "Linear Scan",
+                    "quality_score": 80,
+                    "feedback": "Code executed successfully. AI review is temporarily unavailable."
+                }
 
         # 4. Calculate Percentile Rank (Simple mock logic for now, or real if we have enough data)
         # For now, let's just use a random rank or 0.5 to keep it simple, 
